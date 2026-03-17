@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="home">
+            <img src="./assets/logo.png" alt="">
+            <input id="username" type="text" placeholder="username" class="mt-5">
+            <select name="" id="level" class="mt-2">
+                <option value="">Select Level</option>
+                <option value="easy">Easy</option>
+                <option value="medium">Medium</option>
+                <option value="hard">Hard</option>
+            </select>
+            <div class="button-group mt-2">
+                <button class="btn" id="btn-play" disabled>Play</button>
+                <button class="btn" id="btn-instruction">Instruction</button>
+            </div>
+        </div>
+        <div class="instruction">
+            <div class="header">
+                <h2>How to play games</h2>
+                <button class="btn close" id="btn-close-instruction">&times;</button>
+            </div>
+            <ol>
+                <li>Input username</li>
+                <li>Put the bomb</li>
+                <li>Blow up as many walls as possible</li>
+                <li>Blow up enemies</li>
+                <li>Enjoy!</li>
+            </ol>
+        </div>
+        <div class="countdown">
+            <h1 id="countdown-number">3</h1>
+        </div>
+        <div class="ingame">
+            <canvas id="canvas"></canvas>
+        </div>
+    </div>
+
+    <!-- script fungsionalitas  -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+
+            let interval;
+
+            const username = document.getElementById("username");
+            const level = document.getElementById("level");
+            const btnPlay = document.querySelector("#btn-play");
+
+            checkIdentity();
+
+            username.addEventListener("input", checkIdentity);
+            level.addEventListener("input", checkIdentity);
+
+            const btnInstruction = document.getElementById("btn-instruction");
+            btnInstruction.addEventListener("click", function() {
+               const instruction = document.querySelector(".instruction");
+               instruction.style.display = "block";
+            });
+            const btnCloseInstruction = document.getElementById("btn-close-instruction");
+            btnCloseInstruction.addEventListener("click", function() {
+               const instruction = document.querySelector(".instruction");
+               instruction.style.display = "none";
+            });
+
+            function countdownProcess() {
+                const countdownNumber = document.querySelector("#countdown-number");
+                countdownNumber.innerText = countdownNumber.innerText - 1;
+                
+                if (countdownNumber.innerText == 0) {
+                    countdownNumber.innerText = 3;
+                    const countdown = document.querySelector(".countdown");
+                    countdown.style.display = "none";
+                    clearInterval(interval);
+                }
+            }
+
+            // mulai game 
+            btnPlay.addEventListener("click", function() {
+                const countdown = document.querySelector(".countdown");
+                countdown.style.display = "flex";
+
+                // countdown
+                interval = setInterval(countdownProcess, 1000);
+            })
+
+            
+
+            function checkIdentity() {
+                if (username.value.length > 0 && level.value.length > 0) {
+                    btnPlay.disabled = false;
+                }
+                else {
+                    btnPlay.disabled = true;
+                }
+            }
+        });
+    </script>
+</body>
+</html>
