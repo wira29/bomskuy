@@ -66,10 +66,12 @@
             const ctx = canvas.getContext("2d");
 
             let isInit = 0;
-            let totalImages = 3;
+            let totalImages = 4;
             let imagesLoaded = 0;
             let brackWalls = 16;
             let arrBrackWalls = [];
+            let bombPostition = [];
+            let bombSize = 48;
 
             const imgBackground = new Image();
             imgBackground.src = "./assets/background.jpg";
@@ -80,6 +82,9 @@
             const brackWall = new Image();
             brackWall.src = "./assets/wall.png";
             brackWall.onload = checkImageLoaded;
+            const bomb = new Image();
+            bomb.src = "./assets/bomb.png";
+            bomb.onload = checkImageLoaded;
 
             let blockSize = 66;
             let offset = 8;
@@ -105,6 +110,7 @@
                 let x = Math.floor(Math.random() * (map[y].length - 1));
 
                 if (map[y][x] === 1 && y != player.y && x != player.x) {
+                //    merubah tembok menjadi angka 2 / batu bata  
                     map[y][x] = 2;
                     brackWalls--;
                     arrBrackWalls.push({x: x, y: y});
@@ -128,6 +134,45 @@
                 }
             }
 
+            function bombExplode(position) {
+                // menampilkan ledakan 
+                // checking sekitar 
+                let bombX = position.x;
+                let bombY = position.y;
+
+                // cek kiri
+                if (map[bombY][bombX - 1] == 2) {
+                    map[bombY][bombX - 1] = 1;
+                    const wallIdx = arrBrackWalls.findIndex(item => item.x == bombX - 1 && item.y == bombY);
+                    arrBrackWalls.splice(wallIdx, 1);
+                } 
+                // cek kanan 
+                if (map[bombY][bombX + 1] == 2) {
+                    map[bombY][bombX + 1] = 1;
+                    const wallIdx = arrBrackWalls.findIndex(item => item.x == bombX + 1 && item.y == bombY);
+                    arrBrackWalls.splice(wallIdx, 1);
+                }
+                // cek atas 
+                if (map[bombY - 1][bombX] == 2) {
+                    map[bombY - 1][bombX] = 1;
+                    const wallIdx = arrBrackWalls.findIndex(item => item.x == bombX && item.y == bombY - 1);
+                    arrBrackWalls.splice(wallIdx, 1);
+                }
+                // cek bawah 
+                if (map[bombY + 1][bombX] == 2) {
+                    map[bombY + 1][bombX] = 1;
+                    const wallIdx = arrBrackWalls.findIndex(item => item.x == bombX && item.y == bombY + 1);
+                    arrBrackWalls.splice(wallIdx, 1);
+                }
+
+            }
+
+            function renderBomb() {
+                for (let i = 0; i < bombPostition.length; i++) {
+                    ctx.drawImage(bomb, bombPostition[i].x * blockSize + 9, bombPostition[i].y * blockSize + 9, bombSize, bombSize);
+                }
+            }
+
             function render() {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 ctx.drawImage(imgBackground, 0, 0, canvas.width, canvas.height);
@@ -138,26 +183,47 @@
                     isInit = 1;
                 }
 
+                // bomb
+                renderBomb();
+
                 renderBrackwalls();
                 ctx.drawImage(imgPlayer, player.x * blockSize + offset, player.y * blockSize + offset, player.size, player.size);
             }
+
+            // checking bomb 
+            let checkBomb = setInterval(function() {
+                for (let i = 0; i < bombPostition.length; i++) {
+                    if (bombPostition[i].time == 0) {
+                        bombExplode(bombPostition[i]);
+                        bombPostition.splice(i, 1);
+                        render();
+                    }
+                    else {
+                        bombPostition[i].time--;
+                    }
+                }
+            }, 1000)
 
             window.addEventListener("keydown", function(e) {
                 let nextX = player.x;
                 let nextY = player.y;
 
-                switch (e.key) {
-                    case "ArrowUp":
+                switch (e.keyCode) {
+                    case 38:
                         nextY -= 1;
                         break;
-                    case "ArrowDown":
+                    case 40:
                         nextY += 1;
                         break;
-                    case "ArrowLeft":
+                    case 37:
                         nextX -= 1;
                         break;
-                    case "ArrowRight":
+                    case 39:
                         nextX += 1;
+                        break;
+                    case 32:
+                        console.log("plant bomb");
+                        bombPostition.push({x: player.x, y: player.y, time: 5});
                         break;
                 }
 
