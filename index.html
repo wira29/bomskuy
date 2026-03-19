@@ -40,7 +40,7 @@
             <h1 id="countdown-number">3</h1>
         </div>
         <div class="ingame">
-            <canvas id="canvas" width="700" height="600"></canvas>
+            <canvas id="canvas" width="730" height="600"></canvas>
             <div class="info">
                 <h1>BOMSKUY</h1>
                 <table>
@@ -65,8 +65,11 @@
             const canvas = document.querySelector("#canvas");
             const ctx = canvas.getContext("2d");
 
-            let totalImages = 2;
+            let isInit = 0;
+            let totalImages = 3;
             let imagesLoaded = 0;
+            let brackWalls = 16;
+            let arrBrackWalls = [];
 
             const imgBackground = new Image();
             imgBackground.src = "./assets/background.jpg";
@@ -74,8 +77,11 @@
             const imgPlayer = new Image();
             imgPlayer.src = "./assets/char_right.png";
             imgPlayer.onload = checkImageLoaded;
+            const brackWall = new Image();
+            brackWall.src = "./assets/wall.png";
+            brackWall.onload = checkImageLoaded;
 
-            let blockSize = 64;
+            let blockSize = 66;
             let offset = 8;
             let player = {
                 x: 1,
@@ -92,7 +98,22 @@
                 [0,1,0,1,0,1,0,1,0,1,0],
                 [0,1,1,1,1,1,1,1,1,1,0],
                 [0,0,0,0,0,0,0,0,0,0,0],
-            ]
+            ];
+
+            function randBrackwalls() {
+                let y = Math.floor(Math.random() * (map.length - 1));
+                let x = Math.floor(Math.random() * (map[y].length - 1));
+
+                if (map[y][x] === 1 && y != player.y && x != player.x) {
+                    map[y][x] = 2;
+                    brackWalls--;
+                    arrBrackWalls.push({x: x, y: y});
+                }
+
+                if (brackWalls != 0) {
+                    randBrackwalls();
+                }
+            }
 
             function checkImageLoaded() {
                 imagesLoaded++;
@@ -101,9 +122,23 @@
                 }
             }
 
+            function renderBrackwalls() {
+                for (let i = 0; i < arrBrackWalls.length; i++) {
+                    ctx.drawImage(brackWall, arrBrackWalls[i].x * blockSize, arrBrackWalls[i].y * blockSize, blockSize, blockSize);
+                }
+            }
+
             function render() {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 ctx.drawImage(imgBackground, 0, 0, canvas.width, canvas.height);
+
+                // gambar awal 
+                if (isInit == 0) {
+                    randBrackwalls();
+                    isInit = 1;
+                }
+
+                renderBrackwalls();
                 ctx.drawImage(imgPlayer, player.x * blockSize + offset, player.y * blockSize + offset, player.size, player.size);
             }
 
