@@ -104,5 +104,20 @@ input::placeholder {
 }
 
 .ingame {
-    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    background-color: black;
+}
+
+.ingame canvas {
+    width: 70%;
+}
+
+.ingame .info {
+    width: 30%;
+    color: white;
 }

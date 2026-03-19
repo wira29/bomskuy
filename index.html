@@ -40,9 +40,101 @@
             <h1 id="countdown-number">3</h1>
         </div>
         <div class="ingame">
-            <canvas id="canvas"></canvas>
+            <canvas id="canvas" width="700" height="600"></canvas>
+            <div class="info">
+                <h1>BOMSKUY</h1>
+                <table>
+                    <tr>
+                    <td>Player</td>
+                    <td>:</td>
+                    <td>User</td>
+                </tr>
+                <tr>
+                    <td>Time</td>
+                    <td>:</td>
+                    <td>00:00</td>
+                </tr>      
+                </table>      
+            </div>
         </div>
     </div>
+
+    <!-- script games  -->
+     <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const canvas = document.querySelector("#canvas");
+            const ctx = canvas.getContext("2d");
+
+            let totalImages = 2;
+            let imagesLoaded = 0;
+
+            const imgBackground = new Image();
+            imgBackground.src = "./assets/background.jpg";
+            imgBackground.onload = checkImageLoaded;
+            const imgPlayer = new Image();
+            imgPlayer.src = "./assets/char_right.png";
+            imgPlayer.onload = checkImageLoaded;
+
+            let blockSize = 64;
+            let offset = 8;
+            let player = {
+                x: 1,
+                y: 1,
+                size: 60
+            }
+            const map = [
+                [0,0,0,0,0,0,0,0,0,0,0],
+                [0,1,1,1,1,1,1,1,1,1,0],
+                [0,1,0,1,0,1,0,1,0,1,0],
+                [0,1,1,1,1,1,1,1,1,1,0],
+                [0,1,0,1,0,1,0,1,0,1,0],
+                [0,1,1,1,1,1,1,1,1,1,0],
+                [0,1,0,1,0,1,0,1,0,1,0],
+                [0,1,1,1,1,1,1,1,1,1,0],
+                [0,0,0,0,0,0,0,0,0,0,0],
+            ]
+
+            function checkImageLoaded() {
+                imagesLoaded++;
+                if (imagesLoaded === totalImages) {
+                    render();
+                }
+            }
+
+            function render() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(imgBackground, 0, 0, canvas.width, canvas.height);
+                ctx.drawImage(imgPlayer, player.x * blockSize + offset, player.y * blockSize + offset, player.size, player.size);
+            }
+
+            window.addEventListener("keydown", function(e) {
+                let nextX = player.x;
+                let nextY = player.y;
+
+                switch (e.key) {
+                    case "ArrowUp":
+                        nextY -= 1;
+                        break;
+                    case "ArrowDown":
+                        nextY += 1;
+                        break;
+                    case "ArrowLeft":
+                        nextX -= 1;
+                        break;
+                    case "ArrowRight":
+                        nextX += 1;
+                        break;
+                }
+
+                if (map[nextY] && map [nextY][nextX] === 1) {
+                    player.x = nextX;
+                    player.y = nextY;
+                }
+                
+                render();
+            })
+        })
+     </script>
 
     <!-- script fungsionalitas  -->
     <script>
